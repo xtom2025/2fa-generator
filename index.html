@@ -25,11 +25,12 @@
             --code-color: #38bdf8;
             --shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             --error-color: #f87171;
+            --section-bg: rgba(255, 255, 255, 0.04);
         }
 
         [data-theme="light"] {
             --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 50%, #fae8ff 100%);
-            --card-bg: rgba(255, 255, 255, 0.75);
+            --card-bg: rgba(255, 255, 255, 0.85);
             --card-border: rgba(255, 255, 255, 0.6);
             --text-primary: #0f172a;
             --text-secondary: #64748b;
@@ -40,6 +41,7 @@
             --code-color: #0284c7;
             --shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
             --error-color: #dc2626;
+            --section-bg: rgba(0, 0, 0, 0.03);
         }
 
         * {
@@ -56,19 +58,19 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 24px 16px;
             color: var(--text-primary);
         }
 
         .container {
             width: 100%;
-            max-width: 440px;
+            max-width: 460px;
             background: var(--card-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--card-border);
             border-radius: 24px;
-            padding: 36px 28px;
+            padding: 32px 24px;
             box-shadow: var(--shadow);
             position: relative;
         }
@@ -77,7 +79,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
         .title-group {
@@ -122,7 +124,7 @@
         }
 
         .input-wrapper {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             position: relative;
         }
 
@@ -176,12 +178,12 @@
             background: var(--input-bg);
             border: 1px solid var(--card-border);
             border-radius: 16px;
-            padding: 24px 16px;
+            padding: 20px 16px;
             text-align: center;
             position: relative;
             cursor: pointer;
             overflow: hidden;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .code-card:hover {
@@ -190,21 +192,17 @@
 
         .code-display {
             font-family: 'Fira Code', monospace;
-            font-size: 42px;
+            font-size: 40px;
             font-weight: 700;
             letter-spacing: 4px;
             color: var(--code-color);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             user-select: none;
         }
 
         .copy-hint {
             font-size: 12px;
             color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
         }
 
         .progress-container {
@@ -213,7 +211,7 @@
             background: var(--input-border);
             border-radius: 2px;
             overflow: hidden;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .progress-bar {
@@ -227,6 +225,7 @@
             font-size: 13px;
             color: var(--text-secondary);
             text-align: center;
+            margin-bottom: 24px;
         }
 
         .error-msg {
@@ -234,6 +233,81 @@
             font-size: 12px;
             margin-top: 6px;
             display: none;
+        }
+
+        /* 新增：教程区域样式 */
+        .tutorial-section {
+            background: var(--section-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 18px 16px;
+            margin-bottom: 20px;
+        }
+
+        .tutorial-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-primary);
+        }
+
+        .tutorial-steps {
+            list-style: none;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .tutorial-steps li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .tutorial-steps li::before {
+            content: "•";
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 16px;
+            position: absolute;
+            left: 4px;
+            top: -2px;
+        }
+
+        .tutorial-steps li strong {
+            color: var(--text-primary);
+        }
+
+        /* 新增：联系方式样式 */
+        .contact-footer {
+            border-top: 1px dashed var(--card-border);
+            padding-top: 16px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .contact-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .contact-link:hover {
+            text-decoration: underline;
+            opacity: 0.8;
         }
 
         .toast {
@@ -251,6 +325,7 @@
             transition: all 0.3s ease;
             pointer-events: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 10;
         }
 
         .toast.show {
@@ -277,7 +352,7 @@
     </div>
 
     <div class="input-wrapper">
-        <label for="secret">秘钥 / OTPAuth 链接</label>
+        <label for="secret">密钥 / OTPAuth 链接</label>
         <div class="input-box">
             <input type="text" id="secret" placeholder="粘贴 Base32 密钥或 otpauth://" autocomplete="off">
             <button class="clear-btn" id="clear-btn">&times;</button>
@@ -295,6 +370,29 @@
     </div>
 
     <div class="status-text" id="timer-text">等待输入密钥...</div>
+
+    <!-- 新增：Prime Video 使用教程 -->
+    <div class="tutorial-section">
+        <div class="tutorial-title">
+            <span>🎬</span> Prime Video 登录验证教程
+        </div>
+        <ul class="tutorial-steps">
+            <li><strong>获取密钥</strong>：打开 Prime Video 登录/二次验证界面，复制系统给出的 2FA 密钥。</li>
+            <li><strong>生成验证码</strong>：将密钥粘贴至上方输入框，下方会自动显示 6 位动态验证码。</li>
+            <li><strong>一键复制</strong>：直接点击上方数字区域，即可快速复制验证码。</li>
+            <li><strong>完成登录</strong>：回到 Prime Video 填入验证码，即可成功登录。</li>
+        </ul>
+    </div>
+
+    <!-- 新增：联系方式 -->
+    <div class="contact-footer">
+        <div>如有疑问或账号问题，请联系客服：</div>
+        <div class="contact-links">
+            <a href="https://t.me/your_telegram" target="_blank" class="contact-link">Telegram 客服</a>
+            <span>•</span>
+            <span style="color: var(--text-primary);">微信：amzpv777</span>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -389,7 +487,7 @@
         secretInput.focus();
     });
 
-    // 兼容性好的复制函数 (支持 HTTPS 与 HTTP / 各类浏览器)
+    // 兼容性好的复制函数
     function copyToClipboard(text) {
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(text).then(showToast).catch(() => fallbackCopy(text));
