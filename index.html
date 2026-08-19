@@ -26,6 +26,8 @@
             --shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             --error-color: #f87171;
             --section-bg: rgba(255, 255, 255, 0.04);
+            --highlight-blue: #38bdf8;
+            --highlight-red: #f87171;
         }
 
         [data-theme="light"] {
@@ -42,6 +44,8 @@
             --shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
             --error-color: #dc2626;
             --section-bg: rgba(0, 0, 0, 0.03);
+            --highlight-blue: #0284c7;
+            --highlight-red: #dc2626;
         }
 
         * {
@@ -64,7 +68,7 @@
 
         .container {
             width: 100%;
-            max-width: 460px;
+            max-width: 480px;
             background: var(--card-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -235,53 +239,114 @@
             display: none;
         }
 
-        /* 新增：教程区域样式 */
-        .tutorial-section {
+        /* 畅享指南模块样式 */
+        .guide-section {
             background: var(--section-bg);
             border: 1px solid var(--card-border);
             border-radius: 16px;
-            padding: 18px 16px;
-            margin-bottom: 20px;
+            padding: 18px;
+            margin-bottom: 24px;
         }
 
-        .tutorial-title {
-            font-size: 14px;
+        .guide-section h3 {
+            font-size: 16px;
             font-weight: 700;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            margin-bottom: 6px;
             color: var(--text-primary);
         }
 
-        .tutorial-steps {
-            list-style: none;
+        .guide-intro {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+            line-height: 1.5;
+        }
+
+        details {
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        details:last-child {
+            margin-bottom: 0;
+        }
+
+        summary {
+            padding: 12px 14px;
             font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-primary);
+            user-select: none;
+        }
+
+        summary:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .details-content {
+            padding: 12px 14px 14px 14px;
+            border-top: 1px solid var(--card-border);
+            font-size: 12px;
             color: var(--text-secondary);
             line-height: 1.6;
         }
 
-        .tutorial-steps li {
+        .details-content h4 {
+            font-size: 13px;
+            color: var(--text-primary);
+            margin: 10px 0 4px 0;
+        }
+
+        .details-content h4:first-child {
+            margin-top: 0;
+        }
+
+        .details-content p {
             margin-bottom: 8px;
-            position: relative;
-            padding-left: 20px;
         }
 
-        .tutorial-steps li::before {
-            content: "•";
+        .details-content ul {
+            padding-left: 18px;
+            margin-bottom: 8px;
+        }
+
+        .details-content li {
+            margin-bottom: 4px;
+        }
+
+        .details-content a {
             color: var(--accent-color);
-            font-weight: bold;
-            font-size: 16px;
-            position: absolute;
-            left: 4px;
-            top: -2px;
+            text-decoration: none;
         }
 
-        .tutorial-steps li strong {
+        .details-content a:hover {
+            text-decoration: underline;
+        }
+
+        .highlight-blue {
+            color: var(--highlight-blue);
+            font-weight: 600;
+        }
+
+        .highlight-red {
+            color: var(--highlight-red);
+            font-weight: 600;
+        }
+
+        code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 11px;
             color: var(--text-primary);
         }
 
-        /* 新增：联系方式样式 */
+        /* 联系方式样式 */
         .contact-footer {
             border-top: 1px dashed var(--card-border);
             padding-top: 16px;
@@ -302,12 +367,10 @@
             color: var(--accent-color);
             text-decoration: none;
             font-weight: 600;
-            transition: opacity 0.2s;
         }
 
         .contact-link:hover {
             text-decoration: underline;
-            opacity: 0.8;
         }
 
         .toast {
@@ -371,26 +434,65 @@
 
     <div class="status-text" id="timer-text">等待输入密钥...</div>
 
-    <!-- 新增：Prime Video 使用教程 -->
-    <div class="tutorial-section">
-        <div class="tutorial-title">
-            <span>🎬</span> Prime Video 登录验证教程
-        </div>
-        <ul class="tutorial-steps">
-            <li><strong>获取密钥</strong>：打开 Prime Video 登录/二次验证界面，复制会员账号的验证码OTP密钥。</li>
-            <li><strong>生成验证码</strong>：将密钥粘贴至上方输入框，下方会自动显示 6 位动态验证码。</li>
-            <li><strong>一键复制</strong>：直接点击上方数字区域，即可快速复制验证码。</li>
-            <li><strong>完成登录</strong>：回到 Prime Video 填入验证码，即可成功登录。</li>
-        </ul>
+    <!-- Prime Video 畅享指南 -->
+    <div class="card-module guide-section">
+        <h3>📚 Prime Video 畅享指南</h3>
+        <p class="guide-intro">遇到报错请勿担忧，99%都是网络节点问题<br>请阅读下方指南，或直接联系底部客服</p>
+
+        <details>
+            <summary>💡 观影必看小贴士</summary>
+            <div class="details-content">
+                <ul>
+                    <li><strong>网络推荐：</strong>强烈建议使用 <strong>US(美国)</strong> 或 <strong>HK(香港)</strong> 节点，中文字幕最友好。</li>
+                    <li><strong>观看范围：</strong>仅可观看带 <span class="highlight-blue">蓝色小勾 ✔️</span> 的免费影片。</li>
+                    <li><span class="highlight-red">严禁操作：</span>请勿点击带“小黄袋子”图标的付费影片，尝试播放会<strong>导致账号被封禁</strong>。如需付费内容请联系微信客服。</li>
+                </ul>
+            </div>
+        </details>
+
+        <details>
+            <summary>📱 各设备如何登录观影？</summary>
+            <div class="details-content">
+                <h4>🖥️ 电脑网页端</h4>
+                <ul>
+                    <li>访问官网 <a href="https://www.primevideo.com" target="_blank">primevideo.com</a>，登录时手机区号务必选择 <strong>+1 (US)</strong>。</li>
+                    <li>输入密码后，使用本网页获取 6 位 OTP 填入即可。</li>
+                </ul>
+                <h4>📱 手机 / 平板端</h4>
+                <ul>
+                    <li><strong>安卓：</strong>在 Google Play 或使用 APK Pure 下载 App。</li>
+                    <li><strong>苹果：</strong>需使用外区(如美区/港区) Apple ID 登录 App Store 下载。</li>
+                    <li>打开 App，区号选择 <strong>+1 (US)</strong>，输入密码与本网页的 OTP。</li>
+                </ul>
+                <h4>📺 智能电视端</h4>
+                <ul>
+                    <li>在手机浏览器打开 <a href="https://amazon.com/mytv" target="_blank">amazon.com/mytv</a>，登录后输入电视屏幕上的匹配码。</li>
+                </ul>
+            </div>
+        </details>
+
+        <details>
+            <summary>🆘 常见报错急救包 (转圈/代码)</summary>
+            <div class="details-content">
+                <h4>❓ 报错 7031/5004 或提示“所在地区不可用”</h4>
+                <p><strong>原因：</strong>账号正常！您的网络节点 IP 不够纯净，被官方检测到了。<br><strong>解决：</strong>更换一个更纯净的网络节点线路（推荐切换到 US 或 HK），重启网络工具并刷新网页即可恢复。</p>
+                
+                <h4>❓ 提示“Too many devices (设备过多)”</h4>
+                <p><strong>解决：</strong>请确保每次只在一台设备上播放。换设备看前，请先将上一台设备彻底退出播放页面。</p>
+
+                <h4>❓ 一直转圈圈，连登录页都打不开</h4>
+                <p><strong>解决：</strong>说明您的网络加速工具未开启，或当前节点断线。请切换其他国家的节点，在电脑上按 <code>Ctrl + F5</code> 强制刷新网页，或使用浏览器的“无痕模式”重新打开。</p>
+            </div>
+        </details>
     </div>
 
-    <!-- 新增：联系方式 -->
+    <!-- 联系方式 -->
     <div class="contact-footer">
         <div>如有疑问或账号问题，请联系客服：</div>
         <div class="contact-links">
             <a href="https://t.me/your_telegram" target="_blank" class="contact-link">Telegram 客服</a>
             <span>•</span>
-            <span style="color: var(--text-primary);">微信：amzpv777</span>
+            <span style="color: var(--text-primary);">微信：your_weixin_id</span>
         </div>
     </div>
 </div>
