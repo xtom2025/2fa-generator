@@ -389,13 +389,37 @@
         secretInput.focus();
     });
 
-    // 复制功能 + Toast 反馈
+    // 兼容性好的复制函数 (支持 HTTPS 与 HTTP / 各类浏览器)
+    function copyToClipboard(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(showToast).catch(() => fallbackCopy(text));
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            showToast();
+        } catch (err) {
+            alert('复制失败，请手动长按选中复制');
+        }
+        document.body.removeChild(textarea);
+    }
+
+    // 绑定点击复制事件
     document.getElementById('code-card').addEventListener('click', () => {
         const code = otpCodeDisplay.innerText.replace(/\s+/g, '');
         if (code && code !== "------") {
-            navigator.clipboard.writeText(code).then(() => {
-                showToast();
-            });
+            copyToClipboard(code);
         }
     });
 
