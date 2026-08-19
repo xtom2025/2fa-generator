@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2FA 在线验证码生成器</title>
+    <!-- 引入开源 OTPAuth 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/otpauth@9.3.1/dist/otpauth.umd.min.js"></script>
+    <!-- 引入 Google Fonts 字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --input-border: rgba(255, 255, 255, 0.15);
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --code-color: #38bdf8;
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            --error-color: #f87171;
+        }
+
+        [data-theme="light"] {
+            --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 50%, #fae8ff 100%);
+            --card-bg: rgba(255, 255, 255, 0.75);
+            --card-border: rgba(255, 255, 255, 0.6);
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --input-border: rgba(203, 213, 225, 0.8);
+            --accent-color: #4f46e5;
+            --accent-hover: #4338ca;
+            --code-color: #0284c7;
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            --error-color: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-primary);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 36px 28px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .input-wrapper {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-box {
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 42px 14px 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            font-size: 15px;
+            color: var(--text-primary);
+            outline: none;
+            font-family: 'Fira Code', monospace;
+        }
+
+        input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 16px;
+            display: none;
+        }
+
+        .clear-btn:hover { color: var(--text-primary); }
+
+        .code-card {
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px 16px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .code-card:hover {
+            border-color: var(--accent-color);
+        }
+
+        .code-display {
+            font-family: 'Fira Code', monospace;
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: var(--code-color);
+            margin-bottom: 8px;
+            user-select: none;
+        }
+
+        .copy-hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: var(--input-border);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent-color);
+            width: 100%;
+            transition: width 1s linear;
+        }
+
+        .status-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .error-msg {
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .toast {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: var(--accent-color);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="toast" class="toast">已成功复制验证码</div>
+
+    <div class="header">
+        <div class="title-group">
+            <div class="logo-icon">2F</div>
+            <h1>2FA 验证码</h1>
+        </div>
+        <button class="theme-toggle" id="theme-btn" title="切换主题">
+            <svg id="theme-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </div>
+
+    <div class="input-wrapper">
+        <label for="secret">秘钥 / OTPAuth 链接</label>
+        <div class="input-box">
+            <input type="text" id="secret" placeholder="粘贴 Base32 密钥或 otpauth://" autocomplete="off">
+            <button class="clear-btn" id="clear-btn">&times;</button>
+        </div>
+        <div id="error-msg" class="error-msg">输入的密钥格式无效</div>
+    </div>
+
+    <div class="code-card" id="code-card">
+        <div class="code-display" id="otp-code">------</div>
+        <div class="copy-hint" id="copy-hint">点击任意区域复制</div>
+    </div>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progress"></div>
+    </div>
+
+    <div class="status-text" id="timer-text">等待输入密钥...</div>
+</div>
+
+<script>
+    const secretInput = document.getElementById('secret');
+    const clearBtn = document.getElementById('clear-btn');
+    const otpCodeDisplay = document.getElementById('otp-code');
+    const progressBar = document.getElementById('progress');
+    const timerText = document.getElementById('timer-text');
+    const errorMsg = document.getElementById('error-msg');
+    const toast = document.getElementById('toast');
+    const themeBtn = document.getElementById('theme-btn');
+    const themeIcon = document.getElementById('theme-icon');
+
+    // 1. 主题切换逻辑
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(currentTheme);
+
+    themeBtn.addEventListener('click', () => {
+        let theme = document.documentElement.getAttribute('data-theme');
+        let newTheme = theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+        if (theme === 'light') {
+            themeIcon.innerHTML = `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
+        } else {
+            themeIcon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+        }
+    }
+
+    // 2. 密钥解析与验证码生成
+    function parseSecret(input) {
+        let clean = input.trim();
+        if (clean.startsWith('otpauth://')) {
+            try {
+                const parsed = OTPAuth.URI.parse(clean);
+                return parsed.secret.base32;
+            } catch (e) {
+                return null;
+            }
+        }
+        return clean.replace(/\s+/g, '').toUpperCase();
+    }
+
+    function updateOTP() {
+        const rawInput = secretInput.value;
+        clearBtn.style.display = rawInput ? 'block' : 'none';
+
+        if (!rawInput) {
+            otpCodeDisplay.innerText = "------";
+            timerText.innerText = "等待输入密钥...";
+            progressBar.style.width = "100%";
+            errorMsg.style.display = "none";
+            return;
+        }
+
+        const secretStr = parseSecret(rawInput);
+
+        try {
+            const totp = new OTPAuth.TOTP({
+                algorithm: "SHA1",
+                digits: 6,
+                period: 30,
+                secret: OTPAuth.Secret.fromBase32(secretStr)
+            });
+
+            const code = totp.generate();
+            const seconds = 30 - (Math.floor(Date.now() / 1000) % 30);
+
+            otpCodeDisplay.innerText = code.slice(0, 3) + ' ' + code.slice(3);
+            timerText.innerText = `验证码将在 ${seconds} 秒后刷新`;
+            progressBar.style.width = `${(seconds / 30) * 100}%`;
+            errorMsg.style.display = "none";
+        } catch (e) {
+            otpCodeDisplay.innerText = "------";
+            errorMsg.style.display = "block";
+            timerText.innerText = "密钥错误";
+        }
+    }
+
+    // 3. 事件监听
+    secretInput.addEventListener('input', updateOTP);
+    setInterval(updateOTP, 1000);
+
+    clearBtn.addEventListener('click', () => {
+        secretInput.value = '';
+        updateOTP();
+        secretInput.focus();
+    });
+
+    // 复制功能 + Toast 反馈
+    document.getElementById('code-card').addEventListener('click', () => {
+        const code = otpCodeDisplay.innerText.replace(/\s+/g, '');
+        if (code && code !== "------") {
+            navigator.clipboard.writeText(code).then(() => {
+                showToast();
+            });
+        }
+    });
+
+    function showToast() {
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+</script>
+
+</body>
+</html>
