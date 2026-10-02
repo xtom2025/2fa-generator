@@ -37,7 +37,7 @@
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border-color);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         h2 {
@@ -95,8 +95,7 @@
             font-weight: 600;
             box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
             display: none;
-            z-index: 1000;
-            animation: fadeInOut 1.5s ease;
+            z-index: 2000;
         }
 
         .timer { 
@@ -110,6 +109,49 @@
 
         .error { color: #f87171; font-size: 14px; font-weight: bold; padding: 10px; }
         .debug-info { font-size: 11px; color: #64748b; margin-top: 10px; word-break: break-all; }
+
+        /* ==================== 放置在指南上方的显眼客服按钮区域 ==================== */
+        .top-support-container {
+            margin-bottom: 20px;
+        }
+        
+        .support-btn {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6); /* 亮青到高亮蓝渐变 */
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            letter-spacing: 0.5px;
+            animation: pulseGlow 2s infinite; /* 呼吸发光特效 */
+            box-sizing: border-box;
+        }
+
+        .support-btn:hover {
+            background: linear-gradient(135deg, #0891b2, #2563eb);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(59, 130, 246, 0.6);
+        }
+
+        .support-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* 呼吸灯光晕动画 */
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5); }
+            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
 
         /* 指南区块样式 */
         .guide-box {
@@ -128,9 +170,6 @@
             font-size: 16px; 
             border-bottom: 1px solid var(--border-color); 
             padding-bottom: 10px; 
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
         .notice-banner {
             background: rgba(234, 179, 8, 0.1);
@@ -168,13 +207,71 @@
         .warning-text { color: #f87171; font-weight: 600; }
         .highlight-text { color: #38bdf8; font-weight: 600; }
 
-        .footer-客服 {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 13px;
-            color: var(--text-sub);
-            padding-bottom: 10px;
+        /* 弹窗遮罩层 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
         }
+        /* 弹窗卡片主体 */
+        .modal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 28px 20px;
+            border-radius: 16px;
+            width: 85%;
+            max-width: 320px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            animation: popUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popUp {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-card h4 { margin: 0 0 8px 0; color: var(--text-main); font-size: 18px; }
+        .wechat-id-box {
+            background: #0f172a;
+            border: 2px dashed #38bdf8;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: 800;
+            color: #38bdf8;
+            margin: 15px 0;
+            user-select: all;
+            letter-spacing: 1.5px;
+            font-family: monospace;
+        }
+        .modal-btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 5px;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            transition: opacity 0.2s;
+        }
+        .modal-btn:hover { opacity: 0.9; }
+        .modal-close {
+            background: transparent;
+            color: var(--text-sub);
+            border: none;
+            margin-top: 14px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .modal-close:hover { color: var(--text-main); }
     </style>
 </head>
 <body>
@@ -194,8 +291,15 @@
         <div id="debugInfo" class="debug-info"></div>
     </div>
 
-    <!-- 复制成功提示框 -->
+    <!-- 复制成功提示气泡 -->
     <div id="toast" class="toast">📋 验证码已复制成功！</div>
+
+    <!-- 放在指南上方的显眼特效客服按钮 -->
+    <div class="top-support-container">
+        <button class="support-btn" onclick="openSupportModal()">
+            <span>💬 遇到问题无法解决？【点此联系客服】</span>
+        </button>
+    </div>
 
     <!-- 畅享指南面板 -->
     <div class="guide-box">
@@ -253,10 +357,21 @@
                 解决：说明网络加速工具未开启或节点断线。请切换国家节点，按 Ctrl + F5 强制刷新或使用“无痕模式”重试。
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="footer-客服">
-            如有疑问或账号问题，请随时联系客服 💬
-        </div>
+<!-- 客服弹窗 -->
+<div id="supportModal" class="modal-overlay" onclick="closeSupportModal(event)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+        <h4>📞 售后与客服支持</h4>
+        <p style="font-size: 13px; color: var(--text-sub); margin: 5px 0 10px 0;">请添加下方微信客服号获取人工协助：</p>
+        
+        <!-- 微信号高亮显示框 -->
+        <div class="wechat-id-box" id="wechatText">amzpv777</div>
+        
+        <button class="modal-btn" onclick="copyWechat()">📋 一键复制微信号</button>
+        <br>
+        <button class="modal-close" onclick="closeSupportModal()">关闭窗口</button>
     </div>
 </div>
 
@@ -285,33 +400,62 @@
     const timerContainer = document.getElementById('timerContainer');
     const debugInfoElement = document.getElementById('debugInfo');
 
-    // 3. 点击复制核心逻辑
+    // 3. 点击复制验证码逻辑
     function copyCode() {
         const codeText = codeDisplayElement.innerText;
         if (!codeText || codeText === '------' || codeText === 'ERROR') return;
 
         navigator.clipboard.writeText(codeText).then(() => {
-            showToast();
+            showToast("📋 验证码已复制成功！");
         }).catch(err => {
-            let textArea = document.createElement("textarea");
-            textArea.value = codeText;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand("copy");
-            document.body.removeChild(textArea);
-            showToast();
+            fallbackCopy(codeText, "📋 验证码已复制成功！");
         });
     }
 
-    function showToast() {
+    // 4. 客服弹窗控制逻辑
+    function openSupportModal() {
+        document.getElementById('supportModal').style.display = 'flex';
+    }
+    function closeSupportModal(event) {
+        if (!event || event.target.id === 'supportModal' || event.target.classList.contains('modal-close')) {
+            document.getElementById('supportModal').style.display = 'none';
+        }
+    }
+
+    // 5. 一键复制微信号逻辑
+    function copyWechat() {
+        const wechatId = document.getElementById('wechatText').innerText;
+        navigator.clipboard.writeText(wechatId).then(() => {
+            showToast("📋 微信号 amzpv777 已复制！");
+            closeSupportModal();
+        }).catch(err => {
+            fallbackCopy(wechatId, "📋 微信号 amzpv777 已复制！");
+            closeSupportModal();
+        });
+    }
+
+    // 兼容剪贴板降级函数
+    function fallbackCopy(text, msg) {
+        let textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+        showToast(msg);
+    }
+
+    // 全局气泡提示
+    function showToast(text) {
         const toast = document.getElementById('toast');
+        toast.innerText = text;
         toast.style.display = 'block';
         setTimeout(() => {
             toast.style.display = 'none';
-        }, 1500);
+        }, 2000);
     }
 
-    // 4. 检查外部库并执行计算
+    // 6. 检查外部库并执行计算
     if (typeof OTPAuth === 'undefined') {
         errorMsgElement.innerText = "错误：核心依赖库加载失败，请检查网络或刷新页面。";
         timerContainer.style.display = 'none';
