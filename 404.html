@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Prime Video OTP身份验证与指南</title>
     <!-- 引入 OTPAuth 库用于计算 TOTP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/otpauth/9.2.2/otpauth.umd.min.js"></script>
@@ -24,6 +24,7 @@
             padding: 20px;
             background-color: var(--bg-color);
             color: var(--text-main);
+            /* 优化移动端滚动体验 */
             -webkit-overflow-scrolling: touch;
         }
 
@@ -188,7 +189,7 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border-color);
             overflow: hidden;
-            margin-bottom: 20px; /* 和下面的元素隔开 */
+            margin-bottom: 20px;
         }
 
         .accordion-title {
@@ -232,11 +233,13 @@
             opacity: 0.7;
         }
 
+        /* 展开状态下的箭头旋转 */
         .accordion-title.active .arrow-icon {
             transform: rotate(90deg);
             opacity: 1;
         }
 
+        /* 折叠内容区域 */
         .accordion-content {
             max-height: 0;
             overflow: hidden;
@@ -245,39 +248,22 @@
             padding: 0 20px;
         }
 
+        /* 展开状态的内容 */
         .accordion-content.show {
-            max-height: 1000px;
-            padding: 16px 20px;
+            max-height: 1000px; /* 设置一个足够大的高度 */
+            padding: 16px 20px; /* 展开后的内边距 */
             border-bottom: 1px solid var(--border-color);
         }
 
-        /* 嵌套在折叠内容里的列表样式 */
-        .nested-list {
-            padding-left: 18px;
-            margin: 0;
+        .accordion-content ul { 
+            padding-left: 18px; 
+            margin: 0; 
             color: var(--text-sub);
-            font-size: 13px;
+            font-size: 13.5px;
             line-height: 1.8;
         }
-        .nested-list li { margin-bottom: 8px; }
-        .nested-list li strong { color: var(--text-main); }
-        
-        /* 报错排查卡片样式 */
-        .faq-card { 
-            background: rgba(239, 68, 68, 0.1); 
-            border-left: 3px solid #f87171; 
-            padding: 10px 12px; 
-            margin-top: 12px; 
-            border-radius: 0 8px 8px 0; 
-            font-size: 13px; 
-            color: #fecaca;
-            line-height: 1.6;
-        }
-        .faq-card h4 { color: #f87171; margin: 0 0 4px 0; font-size: 14px; }
-
-        .warning-text { color: #f87171; font-weight: 600; }
-        .highlight-text { color: var(--primary-color); font-weight: 600; }
-        .notice-highlight { color: var(--primary-color); font-weight: 600; }
+        .accordion-content li { margin-bottom: 8px; }
+        .accordion-content li strong { color: var(--text-main); }
 
         /* 弹窗遮罩层 */
         .modal-overlay {
@@ -310,12 +296,12 @@
         .modal-card h4 { margin: 0 0 8px 0; color: var(--text-main); font-size: 18px; }
         .wechat-id-box {
             background: #0f172a;
-            border: 2px dashed #38bdf8;
+            border: 2px dashed var(--primary-color);
             padding: 14px;
             border-radius: 10px;
             font-size: 20px;
             font-weight: 800;
-            color: #38bdf8;
+            color: var(--primary-color);
             margin: 15px 0;
             user-select: all;
             -webkit-user-select: all;
@@ -378,77 +364,103 @@
         </button>
     </div>
 
-    <!-- ==================== 折叠式畅享指南面板 (整体卡片) ==================== -->
+    <!-- ==================== 折叠式畅享指南面板 (精简版) ==================== -->
     <div class="accordion-container">
-        <!-- 大标题：畅享指南 (常驻显示，不折叠) -->
+        <!-- 大标题：畅享指南 (常驻显示) -->
         <div class="accordion-title" style="cursor: default; background: #0f172a; border-bottom: 1px solid var(--border-color);">
             <div class="title-left">
                 <img src="https://img.icons8.com/fluency/48/book-shelf.png" alt="指南图标" class="menu-icon">
                 <span>📚 Prime Video 畅享指南</span>
             </div>
         </div>
-        <!-- 内容块：全局提示 -->
-        <div class="accordion-content show">
-            <div class="notice-banner" style="background: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179, 8, 0.3); color: #facc15; padding: 10px 14px; border-radius: 8px; font-size: 13px;">
-                ⚠️ 遇到报错请勿担忧，99%都是网络问题，请阅读下方指南或联系客服。
+
+        <!-- 折叠项 1：网络推荐 (已修改标题) -->
+        <div class="accordion-title" onclick="toggleAccordion(this)">
+            <div class="title-left">
+                <img src="https://img.icons8.com/fluency/48/internet--v1.png" alt="网络图标" class="menu-icon">
+                <span>🌐 网络推荐</span>
             </div>
-            <ul class="nested-list" style="margin-top: 10px;">
-                <li><strong>网络推荐：</strong>强烈建议使用 <span class="warning-text">US (美国)</span> 或 <span class="warning-text">HK (香港)</span> ，中文字幕最友好。</li>
-                <li><strong>观看范围：</strong>仅可观看带 <span class="highlight-text">蓝色小勾 ✔️</span> 的免费影片。</li>
-                <li><strong>严禁操作：</strong>请勿点击带“小黄袋子”图标的付费影片，尝试播放会导致账号被封禁。<span class="notice-highlight">如需付费订阅 点击上方按钮联系客服。</span></li>
+            <img src="https://img.icons8.com/ios-glyphs/30/94a3b8/chevron-right.png" alt="展开" class="arrow-icon">
+        </div>
+        <div class="accordion-content">
+            <ul>
+                <li>强烈建议使用 <span class="warning-text">US (美国) 或 HK (香港)</span> 。</li>
+                <li>这两个地区的通常中文字幕资源最多最友好，对于需要中文字幕的影迷来说观影体验最好。</li>
             </ul>
         </div>
 
-        <!-- 大标题：各设备使用教程 (常驻显示，不折叠) -->
-        <div class="accordion-title" style="cursor: default; background: #0f172a; border-bottom: 1px solid var(--border-color); border-top: 1px solid var(--border-color); margin-top: 10px;">
+        <!-- 折叠项 2：观看范围 -->
+        <div class="accordion-title" onclick="toggleAccordion(this)">
+            <div class="title-left">
+                <img src="https://img.icons8.com/fluency/48/checked-2.png" alt="勾选图标" class="menu-icon">
+                <span>✅ 观看范围与免费标识</span>
+            </div>
+            <img src="https://img.icons8.com/ios-glyphs/30/94a3b8/chevron-right.png" alt="展开" class="arrow-icon">
+        </div>
+        <div class="accordion-content">
+            <ul>
+                <li>为保证账号安全，您仅可观看带有 <span class="highlight-text">蓝色小勾 ✔️</span> 标识的免费影片。</li>
+            </ul>
+        </div>
+
+        <!-- 折叠项 3：严禁操作 -->
+        <div class="accordion-title" onclick="toggleAccordion(this)">
+            <div class="title-left">
+                <img src="https://img.icons8.com/fluency/48/stop-sign.png" alt="禁止图标" class="menu-icon">
+                <span>🚫 严禁操作与封号警告</span>
+            </div>
+            <img src="https://img.icons8.com/ios-glyphs/30/94a3b8/chevron-right.png" alt="展开" class="arrow-icon">
+        </div>
+        <div class="accordion-content">
+            <ul>
+                <li><strong>严禁点击：</strong>请勿点击带有“小黄袋子”图标的付费影片（Rent/Buy）。</li>
+                <li><strong>后果：</strong>尝试播放付费内容会导致系统自动判定违规，账号将被立即封禁。</li>
+                <li><strong>付费订阅：</strong><span style="color: #38bdf8; font-weight: bold;">如需付费订阅，请点击上方按钮联系客服人工办理。</span></li>
+            </ul>
+        </div>
+
+        <!-- 大标题：各设备使用教程 (常驻显示) -->
+        <div class="accordion-title" style="cursor: default; background: #0f172a; border-bottom: 1px solid var(--border-color); border-top: 1px solid var(--border-color); margin-top: 15px;">
             <div class="title-left">
                 <img src="https://img.icons8.com/fluency/48/multiple-devices.png" alt="设备图标" class="menu-icon">
-                <span>💻 各设备使用教程 (点击下方小项展开)</span>
+                <span>💻 各设备使用教程</span>
             </div>
         </div>
 
-        <!-- 折叠项 1：电脑网页端 -->
+        <!-- 折叠项 A：电脑网页端 -->
         <div class="accordion-title" onclick="toggleAccordion(this)">
             <div class="title-left">🖥️ 电脑网页端</div>
             <img src="https://img.icons8.com/ios-glyphs/30/94a3b8/chevron-right.png" alt="展开" class="arrow-icon">
         </div>
         <div class="accordion-content">
-            <ul class="nested-list">
+            <ul>
                 <li>访问官网 <strong>primevideo.com</strong>，登录时手机区号务必选择 <span class="highlight-text">+1 (US)</span>。</li>
                 <li>输入密码后，使用本网页获取 6 位 OTP 填入即可。</li>
             </ul>
         </div>
 
-        <!-- 折叠项 2：手机 / 平板端 -->
+        <!-- 折叠项 B：手机 / 平板端 -->
         <div class="accordion-title" onclick="toggleAccordion(this)">
             <div class="title-left">📱 手机 / 平板端</div>
             <img src="https://img.icons8.com/ios-glyphs/30/94a3b8/chevron-right.png" alt="展开" class="arrow-icon">
         </div>
         <div class="accordion-content">
-            <ul class="nested-list">
+            <ul>
                 <li><strong>安卓：</strong>在 Google Play 或使用 APK Pure 下载 App。</li>
                 <li><strong>苹果：</strong>需使用外区(如美区/港区) Apple ID 登录 App Store 下载。</li>
                 <li>打开 App，区号选择 <span class="highlight-text">+1 (US)</span>，输入密码与本网页的 OTP。</li>
             </ul>
         </div>
 
-        <!-- 折叠项 3：智能电视端 -->
+        <!-- 折叠项 C：智能电视端 -->
         <div class="accordion-title" onclick="toggleAccordion(this)">
             <div class="title-left">📺 智能电视端</div>
             <img src="https://img.icons8.com/ios-glyphs/30/94a3b8/chevron-right.png" alt="展开" class="arrow-icon">
         </div>
         <div class="accordion-content">
-            <ul class="nested-list">
+            <ul>
                 <li>在手机浏览器打开 <strong>amazon.com/mytv</strong>，登录后输入电视屏幕上的匹配码。</li>
             </ul>
-        </div>
-
-        <!-- 常见报错排查卡片 (固定显示在指南区域底部) -->
-        <div class="faq-card" style="margin: 16px;">
-            <h4>❓ 常见报错排查</h4>
-            <strong>报错 7031 / 5004 或“所在地区不可用”</strong><br>
-            原因：账号正常！您的网络 不够纯净。<br>
-            解决：更换更纯净的网络 ，重启网络工具并刷新网页，一直切换到能正常观影为止，网络问题不能在平台询问可以联系客服。
         </div>
     </div>
 </div>
@@ -507,11 +519,8 @@
 
     // ==================== 4. 折叠菜单控制逻辑 ====================
     function toggleAccordion(element) {
-        // 切换当前标题的激活状态
         element.classList.toggle("active");
-        // 找到紧跟其后的内容区域
         var content = element.nextElementSibling;
-        // 如果内容区域是展开的，就收起；如果是收起的，就展开
         if (content.classList.contains("show")) {
             content.classList.remove("show");
         } else {
