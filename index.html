@@ -26,16 +26,20 @@
 </div>
 
 <script>
-    // 1. 同时兼容读取 ?key= 和 # 后的密钥
-    const urlParams = new URLSearchParams(window.location.search);
-    let secretKey = urlParams.get('key'); 
+    // 1. 获取密钥（优先读取 /code/ 路径，同时也兼容旧的 ?key= 和 #）
+    let secretKey = "";
+    const path = window.location.pathname; 
     
-    // 如果 ?key 没有获取到，尝试获取 # 后面的内容
-    if (!secretKey && window.location.hash) {
-        secretKey = window.location.hash.substring(1);
+    if (path.startsWith('/code/')) {
+        // 从网址路径中提取密钥
+        secretKey = path.replace('/code/', '');
+    } else {
+        // 兼容旧格式
+        const urlParams = new URLSearchParams(window.location.search);
+        secretKey = urlParams.get('key') || (window.location.hash ? window.location.hash.substring(1) : "");
     }
 
-    // --- 增强清洗逻辑开始 ---
+    // 2. 增强清洗逻辑
     if (secretKey) {
         try {
             // 对 URL 编码进行解码 (将 %20 还原为空格等)
@@ -46,20 +50,19 @@
         // 清理所有空格、横杠、换行符等，只保留字母和数字，并强制转换为大写
         secretKey = secretKey.replace(/[\s\-]/g, '').toUpperCase();
     }
-    // --- 增强清洗逻辑结束 ---
 
     const errorMsgElement = document.getElementById('errorMsg');
     const codeDisplayElement = document.getElementById('codeDisplay');
     const timerContainer = document.getElementById('timerContainer');
     const debugInfoElement = document.getElementById('debugInfo');
 
-    // 检查外部库是否加载成功
+    // 3. 检查外部库并执行计算
     if (typeof OTPAuth === 'undefined') {
         errorMsgElement.innerText = "错误：核心依赖库加载失败，请检查网络或刷新页面。";
         timerContainer.style.display = 'none';
     } 
     else if (!secretKey) {
-        errorMsgElement.innerText = "错误：未找到密钥！请在网址末尾添加密钥。\n示例: https://wzlvp.ccwu.cc/#你的密钥";
+        errorMsgElement.innerText = "错误：未找到密钥！\n示例: https://wzlvp.ccwu.cc/code/你的密钥";
         timerContainer.style.display = 'none';
     } 
     else {
@@ -67,7 +70,6 @@
         debugInfoElement.innerText = "当前识别到的密钥前4位: " + secretKey.substring(0, 4) + "***";
 
         try {
-            // 2. 初始化 TOTP
             let totp = new OTPAuth.TOTP({
                 issuer: 'Team',
                 label: '2FA',
@@ -77,7 +79,6 @@
                 secret: secretKey
             });
 
-            // 3. 定义更新逻辑
             function updateCode() {
                 try {
                     let code = totp.generate();
@@ -94,7 +95,6 @@
                 }
             }
 
-            // 4. 立即执行并定时刷新
             updateCode();
             setInterval(updateCode, 1000);
 
