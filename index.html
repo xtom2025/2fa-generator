@@ -26,29 +26,29 @@
 </div>
 
 <script>
-    // 1. 获取密钥（优先读取 /code/ 路径，同时也兼容旧的 ?key= 和 #）
+    // 1. 获取密钥（优先读取 /code/ 路径，兼容旧的 ?key= 和 #）
     let secretKey = "";
     const path = window.location.pathname; 
     
     if (path.startsWith('/code/')) {
-        // 从网址路径中提取密钥
         secretKey = path.replace('/code/', '');
     } else {
-        // 兼容旧格式
         const urlParams = new URLSearchParams(window.location.search);
         secretKey = urlParams.get('key') || (window.location.hash ? window.location.hash.substring(1) : "");
     }
 
-    // 2. 增强清洗逻辑
+    // 2. 终极正则清洗：一网打尽空格、%20、横杠等所有杂质
     if (secretKey) {
         try {
-            // 对 URL 编码进行解码 (将 %20 还原为空格等)
             secretKey = decodeURIComponent(secretKey);
-        } catch (e) {
-            console.warn("URI解码失败, 使用原始格式");
-        }
-        // 清理所有空格、横杠、换行符等，只保留字母和数字，并强制转换为大写
-        secretKey = secretKey.replace(/[\s\-]/g, '').toUpperCase();
+        } catch (e) {}
+        
+        // 正则解释：
+        // %20 : 匹配转义的空格
+        // \s  : 匹配普通空格、换行符等
+        // \-  : 匹配横杠
+        // 统统替换为空字符串 ""，并转为大写
+        secretKey = secretKey.replace(/(%20|\s|\-)/g, '').toUpperCase();
     }
 
     const errorMsgElement = document.getElementById('errorMsg');
@@ -66,7 +66,6 @@
         timerContainer.style.display = 'none';
     } 
     else {
-        // 在页面底部显示处理后的密钥前几位，方便确认清洗是否成功
         debugInfoElement.innerText = "当前识别到的密钥前4位: " + secretKey.substring(0, 4) + "***";
 
         try {
