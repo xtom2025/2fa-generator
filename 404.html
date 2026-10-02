@@ -110,47 +110,72 @@
         .error { color: #f87171; font-size: 14px; font-weight: bold; padding: 10px; }
         .debug-info { font-size: 11px; color: #64748b; margin-top: 10px; word-break: break-all; }
 
-        /* ==================== 放置在指南上方的显眼客服按钮区域 ==================== */
+        /* ==================== 动态双向箭头 + 客标 3D 按钮 ==================== */
         .top-support-container {
             margin-bottom: 20px;
         }
         
         .support-btn {
-            background: linear-gradient(135deg, #06b6d4, #3b82f6); /* 亮青到高亮蓝渐变 */
+            background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
             color: white;
             border: none;
             width: 100%;
-            padding: 15px 20px;
-            font-size: 15px;
+            padding: 16px 20px;
+            font-size: 16px;
             font-weight: bold;
             border-radius: 14px;
             cursor: pointer;
-            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
-            transition: all 0.25s ease;
+            /* 3D 物理厚度阴影 */
+            box-shadow: 0 6px 0 #0369a1, 0 10px 25px rgba(2, 132, 199, 0.4);
+            transition: all 0.1s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 6px;
             letter-spacing: 0.5px;
-            animation: pulseGlow 2s infinite; /* 呼吸发光特效 */
             box-sizing: border-box;
         }
 
         .support-btn:hover {
-            background: linear-gradient(135deg, #0891b2, #2563eb);
+            background: linear-gradient(180deg, #7dd3fc 0%, #0284c7 100%);
             transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(59, 130, 246, 0.6);
+            box-shadow: 0 8px 0 #0369a1, 0 12px 30px rgba(2, 132, 199, 0.6);
         }
 
         .support-btn:active {
-            transform: scale(0.97);
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #0369a1, 0 4px 10px rgba(2, 132, 199, 0.4);
         }
 
-        /* 呼吸灯光晕动画 */
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5); }
-            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        /* 动态跳动左箭头 */
+        .arrow-left {
+            display: inline-block;
+            animation: bounceLeft 1s infinite alternate;
+        }
+        @keyframes bounceLeft {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-4px); }
+        }
+
+        /* 动态跳动右箭头 */
+        .arrow-right {
+            display: inline-block;
+            animation: bounceRight 1s infinite alternate;
+        }
+        @keyframes bounceRight {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(4px); }
+        }
+
+        /* 中间客服图标呼吸特效 */
+        .pulse-icon {
+            display: inline-block;
+            animation: iconPulse 1.5s infinite;
+        }
+        @keyframes iconPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
         /* 指南区块样式 */
@@ -277,7 +302,7 @@
 <body>
 
 <div class="wrapper">
-    <!-- 顶部验证码卡片 -->
+    <!-- 顶部验证码主卡片 -->
     <div class="container">
         <h2>Prime Video 身份验证码</h2>
         <div class="tip-text">👇 点击下方数字方块即可一键复制验证码</div>
@@ -294,10 +319,13 @@
     <!-- 复制成功提示气泡 -->
     <div id="toast" class="toast">📋 验证码已复制成功！</div>
 
-    <!-- 放在指南上方的显眼特效客服按钮 -->
+    <!-- 带有动态双向箭头和客服图标的 3D 按钮 -->
     <div class="top-support-container">
         <button class="support-btn" onclick="openSupportModal()">
-            <span>💬 遇到问题无法解决？【点此联系客服】</span>
+            <span class="arrow-left">👈</span>
+            <span class="pulse-icon">🎧</span>
+            <span>遇到问题？<span style="text-decoration: underline;">【点此联系售后客服】</span></span>
+            <span class="arrow-right">👉</span>
         </button>
     </div>
 
@@ -318,7 +346,7 @@
         </div>
 
         <div class="guide-section">
-            <h4>🖥️ 电脑网页端</h4>
+            <h4>🖥️️ 电脑网页端</h4>
             <ul>
                 <li>访问官网 <strong>primevideo.com</strong>，登录时手机区号务必选择 <span class="highlight-text">+1 (US)</span>。</li>
                 <li>输入密码后，使用本网页获取 6 位 OTP 填入即可。</li>
