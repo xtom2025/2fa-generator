@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>团队 2FA 验证码生成器</title>
+    <!-- 引入 OTPAuth 库用于计算 TOTP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/otpauth/9.2.2/otpauth.umd.min.js"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; margin-top: 15%; background-color: #f4f4f9; }
+        .container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: inline-block; max-width: 90%; }
+        .code { font-size: 56px; font-weight: bold; letter-spacing: 8px; color: #333; margin: 20px 0; }
+        .timer { font-size: 16px; color: #888; margin-bottom: 10px; }
+        .error { color: #d9534f; font-size: 16px; font-weight: bold; padding: 10px; }
+        .debug-info { font-size: 12px; color: #aaa; margin-top: 20px; word-break: break-all; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>身份验证码</h2>
+    <div id="codeDisplay" class="code">------</div>
+    <div class="timer" id="timerContainer">刷新倒计时: <span id="timeRemaining">--</span> 秒</div>
+    <div id="errorMsg" class="error"></div>
+    <div id="debugInfo" class="debug-info"></div>
+</div>
+
+<script>
+    // 1. 获取密钥（优先读取 /code/ 路径，同时也兼容旧的 ?key= 和 #）
+    let secretKey = "";
+    const path = window.location.pathname; 
+    
+    if (path.startsWith('/code/')) {
+        // 从网址路径中提取密钥
+        secretKey = path.replace('/code/', '');
+    } else {
+        // 兼容旧格式
+        const urlParams = new URLSearchParams(window.location.search);
+        secretKey = urlParams.get('key') || (window.location.hash ? window.location.hash.substring(1) : "");
+    }
+
+    // 2. 增强清洗逻辑
+    if (secretKey) {
+        try {
+            // 对 URL 编码进行解码 (将 %20 还原为空格等)
+            secretKey = decodeURIComponent(secretKey);
+        } catch (e) {
+            console.warn("URI解码失败, 使用原始格式");
+        }
+        // 清理所有空格、横杠、换行符等，只保留字母和数字，并强制转换为大写
+        secretKey = secretKey.replace(/[\s\-]/g, '').toUpperCase();
+    }
+
+    const errorMsgElement = document.getElementById('errorMsg');
+    const codeDisplayElement = document.getElementById('codeDisplay');
+    const timerContainer = document.getElementById('timerContainer');
+    const debugInfoElement = document.getElementById('debugInfo');
+
+    // 3. 检查外部库并执行计算
+    if (typeof OTPAuth === 'undefined') {
+        errorMsgElement.innerText = "错误：核心依赖库加载失败，请检查网络或刷新页面。";
+        timerContainer.style.display = 'none';
+    } 
+    else if (!secretKey) {
+        errorMsgElement.innerText = "错误：未找到密钥！\n示例: https://wzlvp.ccwu.cc/code/你的密钥";
+        timerContainer.style.display = 'none';
+    } 
+    else {
+        // 在页面底部显示处理后的密钥前几位，方便确认清洗是否成功
+        debugInfoElement.innerText = "当前识别到的密钥前4位: " + secretKey.substring(0, 4) + "***";
+
+        try {
+            let totp = new OTPAuth.TOTP({
+                issuer: 'Team',
+                label: '2FA',
+                algorithm: 'SHA1',
+                digits: 6,
+                period: 30,
+                secret: secretKey
+            });
+
+            function updateCode() {
+                try {
+                    let code = totp.generate();
+                    codeDisplayElement.innerText = code;
+
+                    let epoch = Math.floor(Date.now() / 1000);
+                    let remaining = 30 - (epoch % 30);
+                    document.getElementById('timeRemaining').innerText = remaining;
+                } catch (e) {
+                    errorMsgElement.innerText = "验证码生成失败，可能是密钥格式错误 (必须是 Base32 编码)。";
+                    codeDisplayElement.innerText = "ERROR";
+                    timerContainer.style.display = 'none';
+                    console.error(e);
+                }
+            }
+
+            updateCode();
+            setInterval(updateCode, 1000);
+
+        } catch (e) {
+            errorMsgElement.innerText = "初始化失败：密钥包含非法字符！请确保是有效的 Base32 编码。";
+            codeDisplayElement.innerText = "ERROR";
+            timerContainer.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>
