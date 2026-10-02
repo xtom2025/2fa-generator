@@ -35,12 +35,25 @@
         secretKey = window.location.hash.substring(1);
     }
 
+    // --- 增强清洗逻辑开始 ---
+    if (secretKey) {
+        try {
+            // 对 URL 编码进行解码 (将 %20 还原为空格等)
+            secretKey = decodeURIComponent(secretKey);
+        } catch (e) {
+            console.warn("URI解码失败, 使用原始格式");
+        }
+        // 清理所有空格、横杠、换行符等，只保留字母和数字，并强制转换为大写
+        secretKey = secretKey.replace(/[\s\-]/g, '').toUpperCase();
+    }
+    // --- 增强清洗逻辑结束 ---
+
     const errorMsgElement = document.getElementById('errorMsg');
     const codeDisplayElement = document.getElementById('codeDisplay');
     const timerContainer = document.getElementById('timerContainer');
     const debugInfoElement = document.getElementById('debugInfo');
 
-    // 检查外部库是否加载成功 (国内有时候 cdnjs 会网络波动)
+    // 检查外部库是否加载成功
     if (typeof OTPAuth === 'undefined') {
         errorMsgElement.innerText = "错误：核心依赖库加载失败，请检查网络或刷新页面。";
         timerContainer.style.display = 'none';
@@ -50,8 +63,7 @@
         timerContainer.style.display = 'none';
     } 
     else {
-        // 清理密钥中可能带入的空格
-        secretKey = secretKey.replace(/\s+/g, '');
+        // 在页面底部显示处理后的密钥前几位，方便确认清洗是否成功
         debugInfoElement.innerText = "当前识别到的密钥前4位: " + secretKey.substring(0, 4) + "***";
 
         try {
@@ -87,7 +99,7 @@
             setInterval(updateCode, 1000);
 
         } catch (e) {
-            errorMsgElement.innerText = "初始化失败：密钥包含非法字符！";
+            errorMsgElement.innerText = "初始化失败：密钥包含非法字符！请确保是有效的 Base32 编码。";
             codeDisplayElement.innerText = "ERROR";
             timerContainer.style.display = 'none';
         }
