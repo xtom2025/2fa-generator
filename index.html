@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prime Video 验证码与使用指南</title>
+    <title>Prime Video OTP身份验证与指南</title>
     <!-- 引入 OTPAuth 库用于计算 TOTP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/otpauth/9.2.2/otpauth.umd.min.js"></script>
     <style>
         :root {
-            --primary-color: #00a8e1; /* Prime Video 蓝 */
+            --primary-color: #38bdf8; /* 亮青色作为主色调 */
             --bg-color: #0f172a;     /* 高级深色背景 */
             --card-bg: #1e293b;      /* 卡片背景 */
             --text-main: #f8fafc;    /* 主文本色 */
             --text-sub: #94a3b8;     /* 辅助文本色 */
             --border-color: #334155; /* 边框色 */
+            --radius: 16px;
         }
 
         body {
@@ -23,6 +24,8 @@
             padding: 20px;
             background-color: var(--bg-color);
             color: var(--text-main);
+            /* 优化移动端滚动体验 */
+            -webkit-overflow-scrolling: touch;
         }
 
         .wrapper {
@@ -33,8 +36,8 @@
         /* 顶部验证码主卡片 */
         .container {
             background: var(--card-bg);
-            padding: 30px 20px;
-            border-radius: 16px;
+            padding: 25px 20px;
+            border-radius: var(--radius);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border-color);
             margin-bottom: 20px;
@@ -58,27 +61,31 @@
             background: #0f172a;
             border: 2px dashed var(--primary-color);
             border-radius: 12px;
-            padding: 15px 0;
+            padding: 12px 0;
             margin: 15px 0;
             cursor: pointer;
             transition: all 0.2s ease;
             user-select: none;
+            -webkit-user-select: none; /* 兼容Safari */
         }
         .code-box:hover {
-            border-color: #38bdf8;
+            border-color: #7dd3fc;
             background: #111827;
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
         .code-box:active {
-            transform: scale(0.98);
+            transform: translateY(1px);
         }
 
         .code { 
-            font-size: 48px; 
+            font-size: 42px; 
             font-weight: 800; 
-            letter-spacing: 6px; 
+            letter-spacing: 5px; 
             color: var(--primary-color); 
             font-family: monospace;
+            /* 防止选中文本放大 */
+            text-size-adjust: none;
+            -webkit-text-size-adjust: none;
         }
 
         /* 复制成功提示气泡 */
@@ -96,6 +103,7 @@
             box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
             display: none;
             z-index: 2000;
+            pointer-events: none; /* 防止阻挡点击 */
         }
 
         .timer { 
@@ -103,12 +111,12 @@
             color: var(--text-sub); 
         }
         .timer span {
-            color: #38bdf8;
+            color: var(--primary-color);
             font-weight: bold;
         }
 
-        .error { color: #f87171; font-size: 14px; font-weight: bold; padding: 10px; }
-        .debug-info { font-size: 11px; color: #64748b; margin-top: 10px; word-break: break-all; }
+        .error { color: #f87171; font-size: 14px; font-weight: bold; padding: 10px; line-height: 1.5; }
+        .debug-info { font-size: 10px; color: #475569; margin-top: 10px; word-break: break-all; }
 
         /* ==================== 动态双向聚拢箭头 + 客服图标 3D 按钮 ==================== */
         .top-support-container {
@@ -120,13 +128,13 @@
             color: white;
             border: none;
             width: 100%;
-            padding: 16px 20px;
+            padding: 14px 20px;
             font-size: 16px;
             font-weight: bold;
             border-radius: 14px;
             cursor: pointer;
             /* 3D 物理厚度阴影 */
-            box-shadow: 0 6px 0 #0369a1, 0 10px 25px rgba(2, 132, 199, 0.4);
+            box-shadow: 0 5px 0 #0369a1, 0 8px 20px rgba(2, 132, 199, 0.3);
             transition: all 0.1s ease;
             display: flex;
             align-items: center;
@@ -138,16 +146,15 @@
 
         .support-btn:hover {
             background: linear-gradient(180deg, #7dd3fc 0%, #0284c7 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 0 #0369a1, 0 12px 30px rgba(2, 132, 199, 0.6);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 0 #0369a1, 0 10px 25px rgba(2, 132, 199, 0.5);
         }
 
         .support-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #0369a1, 0 4px 10px rgba(2, 132, 199, 0.4);
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #0369a1, 0 4px 10px rgba(2, 132, 199, 0.3);
         }
 
-        /* 左侧手势向右跳动 */
         .arrow-left {
             display: inline-block;
             animation: moveRight 1s infinite alternate;
@@ -157,7 +164,6 @@
             100% { transform: translateX(3px); }
         }
 
-        /* 右侧手势向左跳动 */
         .arrow-right {
             display: inline-block;
             animation: moveLeft 1s infinite alternate;
@@ -167,7 +173,6 @@
             100% { transform: translateX(-3px); }
         }
 
-        /* 中间客服图标呼吸特效 */
         .pulse-icon {
             display: inline-block;
             animation: iconPulse 1.5s infinite;
@@ -178,100 +183,148 @@
             100% { transform: scale(1); }
         }
 
-        /* 指南区块样式 */
-        .guide-box {
+        /* ==================== 折叠菜单 (Accordion) 样式 ==================== */
+        .accordion-container {
             text-align: left;
             background: var(--card-bg);
-            padding: 24px;
-            border-radius: 16px;
+            border-radius: var(--radius);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border-color);
-            font-size: 13.5px;
-            line-height: 1.6;
-        }
-        .guide-box h3 { 
-            color: var(--primary-color); 
-            margin-top: 0; 
-            font-size: 16px; 
-            border-bottom: 1px solid var(--border-color); 
-            padding-bottom: 10px; 
-        }
-        .notice-banner {
-            background: rgba(234, 179, 8, 0.1);
-            border: 1px solid rgba(234, 179, 8, 0.3);
-            color: #facc15;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 16px;
+            overflow: hidden; /* 隐藏圆角外的溢出内容 */
         }
 
-        .guide-section {
-            margin-bottom: 16px;
+        .accordion-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+            user-select: none;
         }
-        .guide-section h4 { 
-            margin: 12px 0 6px 0; 
-            font-size: 14px; 
-            color: var(--text-main); 
+
+        .accordion-title:last-child {
+            border-bottom: none;
         }
-        .guide-box ul { padding-left: 18px; margin: 4px 0; color: var(--text-sub); }
-        .guide-box li { margin-bottom: 4px; }
-        .guide-box li strong { color: var(--text-main); }
+
+        .accordion-title:hover {
+            background-color: rgba(56, 189, 248, 0.08); /* 悬停时显示淡淡的青色 */
+        }
+
+        .title-left {
+            display: flex;
+            align-items: center;
+            gap: 12px; /* 图标和文字间距 */
+        }
+
+        /* 菜单图标样式 (使用 rem 或 px 固定大小) */
+        .menu-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            /* 如果原图是黑色或深色，可以在深色背景下反色为白色 */
+            /* filter: brightness(0) invert(1); */
+        }
+
+        /* 折叠箭头 */
+        .arrow-icon {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.3s ease;
+            opacity: 0.7;
+        }
+
+        /* 展开状态下的箭头旋转 */
+        .accordion-title.active .arrow-icon {
+            transform: rotate(90deg);
+            opacity: 1;
+        }
+
+        /* 折叠内容区域 */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+            background-color: rgba(15, 23, 42, 0.4); /* 稍微深一点的背景以区分 */
+            padding: 0 20px; /* 只有左右内边距，上下为0 */
+        }
+
+        /* 展开状态的内容 */
+        .accordion-content.show {
+            max-height: 1000px; /* 设置一个足够大的高度 */
+            padding: 16px 20px; /* 展开后的内边距 */
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .accordion-content ul { 
+            padding-left: 18px; 
+            margin: 0; 
+            color: var(--text-sub);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        .accordion-content li { margin-bottom: 8px; }
+        .accordion-content li strong { color: var(--text-main); }
         
         .faq { 
-            background: rgba(239, 68, 68, 0.08); 
+            background: rgba(239, 68, 68, 0.1); 
             border-left: 3px solid #f87171; 
             padding: 10px 12px; 
-            margin: 8px 0; 
+            margin-top: 10px; 
             border-radius: 0 8px 8px 0; 
             font-size: 13px; 
-            color: var(--text-sub);
+            color: #fecaca;
         }
         .faq strong { color: #f87171; }
 
         .warning-text { color: #f87171; font-weight: 600; }
-        .highlight-text { color: #38bdf8; font-weight: 600; }
-        /* 亮青色高亮样式 (#38bdf8) */
-        .notice-highlight { color: #38bdf8; font-weight: 600; }
+        .highlight-text { color: var(--primary-color); font-weight: 600; }
+        .notice-highlight { color: var(--primary-color); font-weight: 600; }
 
         /* 弹窗遮罩层 */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.65);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(3px);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 3000;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-        /* 弹窗卡片主体 */
+        .modal-overlay.show { display: flex; opacity: 1; }
+        
         .modal-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             padding: 28px 20px;
-            border-radius: 16px;
+            border-radius: var(--radius);
             width: 85%;
             max-width: 320px;
             text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            animation: popUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+            transform: scale(0.9);
+            transition: transform 0.3s;
         }
-        @keyframes popUp {
-            from { transform: scale(0.85); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
+        .modal-overlay.show .modal-card { transform: scale(1); }
         .modal-card h4 { margin: 0 0 8px 0; color: var(--text-main); font-size: 18px; }
         .wechat-id-box {
             background: #0f172a;
-            border: 2px dashed #38bdf8;
+            border: 2px dashed var(--primary-color);
             padding: 14px;
             border-radius: 10px;
             font-size: 20px;
             font-weight: 800;
-            color: #38bdf8;
+            color: var(--primary-color);
             margin: 15px 0;
             user-select: all;
+            -webkit-user-select: all;
             letter-spacing: 1.5px;
             font-family: monospace;
         }
@@ -331,15 +384,20 @@
         </button>
     </div>
 
-    <!-- 畅享指南面板 -->
-    <div class="guide-box">
-        <h3>📚 Prime Video 畅享指南</h3>
-        
-        <div class="notice-banner">
-            ⚠️ 遇到报错请勿担忧，99%都是网络节点问题，请阅读下方指南或联系客服。
+    <!-- ==================== 折叠式畅享指南面板 ==================== -->
+    <div class="accordion-container">
+        <!-- 标题 1：网络推荐 (对应原图第一条) -->
+        <div class="accordion-title" onclick="toggleAccordion(this)">
+            <div class="title-left">
+                <!-- 请确保下方 src 指向你的图片/图标 URL，或者使用 base64 -->
+                <img src="https://img.icons8.com/fluency/48/internet--v1.png" alt="网络图标" class="menu-icon">
+                <span>🌐 网络与观影规则</span>
+            </div>
+            <!-- 简单的 SVG 右箭头图标 -->
+            <img src="https://img.icons8.com/ios-glyphs/30/475569/chevron-right.png" alt="展开" class="arrow-icon">
         </div>
-        
-        <div class="guide-section">
+        <!-- 内容 1 -->
+        <div class="accordion-content">
             <ul>
                 <li><strong>网络推荐：</strong>强烈建议使用 <span class="warning-text">US (美国)</span> 或 <span class="warning-text">HK (香港)</span> 节点，中文字幕最友好。</li>
                 <li><strong>观看范围：</strong>仅可观看带 <span class="highlight-text">蓝色小勾 ✔️</span> 的免费影片。</li>
@@ -347,46 +405,45 @@
             </ul>
         </div>
 
-        <div class="guide-section">
-            <h4>🖥 电脑网页端</h4>
-            <ul>
-                <li>访问官网 <strong>primevideo.com</strong>，登录时手机区号务必选择 <span class="highlight-text">+1 (US)</span>。</li>
-                <li>输入密码后，使用本网页获取 6 位 OTP 填入即可。</li>
-            </ul>
+        <!-- 标题 2：各设备使用教程 (总标题) -->
+        <div class="accordion-title" onclick="toggleAccordion(this)">
+            <div class="title-left">
+                <img src="https://img.icons8.com/fluency/48/multiple-devices.png" alt="设备图标" class="menu-icon">
+                <span>💻 各设备使用教程</span>
+            </div>
+            <img src="https://img.icons8.com/ios-glyphs/30/475569/chevron-right.png" alt="展开" class="arrow-icon">
         </div>
-
-        <div class="guide-section">
-            <h4>📱 手机 / 平板端</h4>
-            <ul>
-                <li><strong>安卓：</strong>在 Google Play 或使用 APK Pure 下载 App。</li>
-                <li><strong>苹果：</strong>需使用外区(如美区/港区) Apple ID 登录 App Store 下载。</li>
-                <li>打开 App，区号选择 <span class="highlight-text">+1 (US)</span>，输入密码与本网页的 OTP。</li>
-            </ul>
-        </div>
-
-        <div class="guide-section">
-            <h4>📺 智能电视端</h4>
-            <ul>
-                <li>在手机浏览器打开 <strong>amazon.com/mytv</strong>，登录后输入电视屏幕上的匹配码。</li>
-            </ul>
-        </div>
-
-        <div class="guide-section">
-            <h4 style="color: #f87171;">❓ 常见报错排查</h4>
+        <!-- 内容 2 (包含所有子设备) -->
+        <div class="accordion-content">
+            <div class="guide-section">
+                <h4>🖥️ 电脑网页端</h4>
+                <ul>
+                    <li>访问官网 <strong>primevideo.com</strong>，登录时手机区号务必选择 <span class="highlight-text">+1 (US)</span>。</li>
+                    <li>输入密码后，使用本网页获取 6 位 OTP 填入即可。</li>
+                </ul>
+            </div>
+            <div class="guide-section">
+                <h4>📱 手机 / 平板端</h4>
+                <ul>
+                    <li><strong>安卓：</strong>在 Google Play 或使用 APK Pure 下载 App。</li>
+                    <li><strong>苹果：</strong>需使用外区(如美区/港区) Apple ID 登录 App Store 下载。</li>
+                    <li>打开 App，区号选择 <span class="highlight-text">+1 (US)</span>，输入密码与本网页的 OTP。</li>
+                </ul>
+            </div>
+            <div class="guide-section">
+                <h4>📺 智能电视端</h4>
+                <ul>
+                    <li>在手机浏览器打开 <strong>amazon.com/mytv</strong>，登录后输入电视屏幕上的匹配码。</li>
+                </ul>
+            </div>
             <div class="faq">
+                <h4 style="color: #f87171; margin: 0 0 4px 0;">❓ 常见报错排查</h4>
                 <strong>报错 7031 / 5004 或“所在地区不可用”</strong><br>
                 原因：账号正常！您的网络节点 IP 不够纯净。<br>
                 解决：更换更纯净的 US/HK 节点，重启网络工具并刷新网页。
             </div>
-            <div class="faq">
-                <strong>提示“Too many devices (设备过多)”</strong><br>
-                解决：请确保每次只在一台设备上播放。换设备看前，请先将上一台设备彻底退出播放页面。
-            </div>
-            <div class="faq">
-                <strong>一直转圈圈，连登录页都打不开</strong><br>
-                解决：说明网络加速工具未开启或节点断线。请切换国家节点，按 Ctrl + F5 强制刷新或使用“无痕模式”重试。
-            </div>
         </div>
+
     </div>
 </div>
 
@@ -406,7 +463,7 @@
 </div>
 
 <script>
-    // 1. 获取密钥（优先读取 /code/ 路径，兼容旧的 ?key= 和 #）
+    // 1. 全能密钥获取逻辑：同时支持 /code/ 路径、?key= 参数、#hash
     let secretKey = "";
     const path = window.location.pathname; 
     
@@ -442,17 +499,33 @@
         });
     }
 
-    // 4. 客服弹窗控制逻辑
-    function openSupportModal() {
-        document.getElementById('supportModal').style.display = 'flex';
-    }
-    function closeSupportModal(event) {
-        if (!event || event.target.id === 'supportModal' || event.target.classList.contains('modal-close')) {
-            document.getElementById('supportModal').style.display = 'none';
+    // ==================== 4. 折叠菜单控制逻辑 ====================
+    function toggleAccordion(element) {
+        element.classList.toggle("active");
+        var content = element.nextElementSibling;
+        if (content.classList.contains("show")) {
+            content.classList.remove("show");
+        } else {
+            // 可选：如果想实现“每次只展开一个”，可以在这里关闭其他已展开的
+            // var allContents = document.querySelectorAll(".accordion-content");
+            // var allTitles = document.querySelectorAll(".accordion-title");
+            // allContents.forEach(c => c.classList.remove("show"));
+            // allTitles.forEach(t => t.classList.remove("active"));
+            content.classList.add("show");
         }
     }
 
-    // 5. 一键复制客服号逻辑
+    // ==================== 5. 客服弹窗控制逻辑 ====================
+    function openSupportModal() {
+        document.getElementById('supportModal').classList.add('show');
+    }
+    function closeSupportModal(event) {
+        if (!event || event.target.id === 'supportModal' || event.target.classList.contains('modal-close')) {
+            document.getElementById('supportModal').classList.remove('show');
+        }
+    }
+
+    // 6. 一键复制客服号逻辑
     function copyWechat() {
         const wechatId = document.getElementById('wechatText').innerText;
         navigator.clipboard.writeText(wechatId).then(() => {
@@ -485,13 +558,15 @@
         }, 2000);
     }
 
-    // 6. 检查外部库并执行计算
+    // 7. 检查外部库并执行计算
     if (typeof OTPAuth === 'undefined') {
         errorMsgElement.innerText = "错误：核心依赖库加载失败，请检查网络或刷新页面。";
         timerContainer.style.display = 'none';
     } 
     else if (!secretKey) {
-        errorMsgElement.innerText = "错误：未找到密钥！\n示例: https://wzlvp.ccwu.cc/code/你的密钥";
+        // 如果直接访问根域名 https://wzlvp.ccwu.cc，给出友好提示
+        errorMsgElement.innerHTML = "💡 提示：您当前直接访问的是主页。<br>如需获取验证码，请使用带密钥的完整链接，例如：<br><span style='color: #38bdf8; font-size: 13px;'>https://wzlvp.ccwu.cc/code/你的密钥</span>";
+        codeDisplayElement.innerText = "NO KEY";
         timerContainer.style.display = 'none';
     } 
     else {
