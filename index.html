@@ -24,7 +24,6 @@
             padding: 20px;
             background-color: var(--bg-color);
             color: var(--text-main);
-            /* 优化移动端滚动体验 */
             -webkit-overflow-scrolling: touch;
         }
 
@@ -66,7 +65,7 @@
             cursor: pointer;
             transition: all 0.2s ease;
             user-select: none;
-            -webkit-user-select: none; /* 兼容Safari */
+            -webkit-user-select: none;
         }
         .code-box:hover {
             border-color: #7dd3fc;
@@ -83,7 +82,6 @@
             letter-spacing: 5px; 
             color: var(--primary-color); 
             font-family: monospace;
-            /* 防止选中文本放大 */
             text-size-adjust: none;
             -webkit-text-size-adjust: none;
         }
@@ -103,7 +101,7 @@
             box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
             display: none;
             z-index: 2000;
-            pointer-events: none; /* 防止阻挡点击 */
+            pointer-events: none;
         }
 
         .timer { 
@@ -133,7 +131,6 @@
             font-weight: bold;
             border-radius: 14px;
             cursor: pointer;
-            /* 3D 物理厚度阴影 */
             box-shadow: 0 5px 0 #0369a1, 0 8px 20px rgba(2, 132, 199, 0.3);
             transition: all 0.1s ease;
             display: flex;
@@ -190,7 +187,8 @@
             border-radius: var(--radius);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border-color);
-            overflow: hidden; /* 隐藏圆角外的溢出内容 */
+            overflow: hidden;
+            margin-bottom: 20px; /* 和下面的元素隔开 */
         }
 
         .accordion-title {
@@ -212,25 +210,21 @@
         }
 
         .accordion-title:hover {
-            background-color: rgba(56, 189, 248, 0.08); /* 悬停时显示淡淡的青色 */
+            background-color: rgba(56, 189, 248, 0.08);
         }
 
         .title-left {
             display: flex;
             align-items: center;
-            gap: 12px; /* 图标和文字间距 */
+            gap: 12px;
         }
 
-        /* 菜单图标样式 (使用 rem 或 px 固定大小) */
         .menu-icon {
             width: 24px;
             height: 24px;
             object-fit: contain;
-            /* 如果原图是黑色或深色，可以在深色背景下反色为白色 */
-            /* filter: brightness(0) invert(1); */
         }
 
-        /* 折叠箭头 */
         .arrow-icon {
             width: 18px;
             height: 18px;
@@ -238,48 +232,48 @@
             opacity: 0.7;
         }
 
-        /* 展开状态下的箭头旋转 */
         .accordion-title.active .arrow-icon {
             transform: rotate(90deg);
             opacity: 1;
         }
 
-        /* 折叠内容区域 */
         .accordion-content {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.4s ease-out, padding 0.4s ease-out;
-            background-color: rgba(15, 23, 42, 0.4); /* 稍微深一点的背景以区分 */
-            padding: 0 20px; /* 只有左右内边距，上下为0 */
+            background-color: rgba(15, 23, 42, 0.4);
+            padding: 0 20px;
         }
 
-        /* 展开状态的内容 */
         .accordion-content.show {
-            max-height: 1000px; /* 设置一个足够大的高度 */
-            padding: 16px 20px; /* 展开后的内边距 */
+            max-height: 1000px;
+            padding: 16px 20px;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .accordion-content ul { 
-            padding-left: 18px; 
-            margin: 0; 
+        /* 嵌套在折叠内容里的列表样式 */
+        .nested-list {
+            padding-left: 18px;
+            margin: 0;
             color: var(--text-sub);
             font-size: 13px;
             line-height: 1.8;
         }
-        .accordion-content li { margin-bottom: 8px; }
-        .accordion-content li strong { color: var(--text-main); }
+        .nested-list li { margin-bottom: 8px; }
+        .nested-list li strong { color: var(--text-main); }
         
-        .faq { 
+        /* 报错排查卡片样式 */
+        .faq-card { 
             background: rgba(239, 68, 68, 0.1); 
             border-left: 3px solid #f87171; 
             padding: 10px 12px; 
-            margin-top: 10px; 
+            margin-top: 12px; 
             border-radius: 0 8px 8px 0; 
             font-size: 13px; 
             color: #fecaca;
+            line-height: 1.6;
         }
-        .faq strong { color: #f87171; }
+        .faq-card h4 { color: #f87171; margin: 0 0 4px 0; font-size: 14px; }
 
         .warning-text { color: #f87171; font-weight: 600; }
         .highlight-text { color: var(--primary-color); font-weight: 600; }
@@ -316,12 +310,12 @@
         .modal-card h4 { margin: 0 0 8px 0; color: var(--text-main); font-size: 18px; }
         .wechat-id-box {
             background: #0f172a;
-            border: 2px dashed var(--primary-color);
+            border: 2px dashed #38bdf8;
             padding: 14px;
             border-radius: 10px;
             font-size: 20px;
             font-weight: 800;
-            color: var(--primary-color);
+            color: #38bdf8;
             margin: 15px 0;
             user-select: all;
             -webkit-user-select: all;
@@ -384,66 +378,78 @@
         </button>
     </div>
 
-    <!-- ==================== 折叠式畅享指南面板 ==================== -->
+    <!-- ==================== 折叠式畅享指南面板 (整体卡片) ==================== -->
     <div class="accordion-container">
-        <!-- 标题 1：网络推荐 (对应原图第一条) -->
-        <div class="accordion-title" onclick="toggleAccordion(this)">
+        <!-- 大标题：畅享指南 (常驻显示，不折叠) -->
+        <div class="accordion-title" style="cursor: default; background: #0f172a; border-bottom: 1px solid var(--border-color);">
             <div class="title-left">
-                <!-- 请确保下方 src 指向你的图片/图标 URL，或者使用 base64 -->
-                <img src="https://img.icons8.com/fluency/48/internet--v1.png" alt="网络图标" class="menu-icon">
-                <span>🌐 网络与观影规则</span>
+                <img src="https://img.icons8.com/fluency/48/book-shelf.png" alt="指南图标" class="menu-icon">
+                <span>📚 Prime Video 畅享指南</span>
             </div>
-            <!-- 简单的 SVG 右箭头图标 -->
-            <img src="https://img.icons8.com/ios-glyphs/30/475569/chevron-right.png" alt="展开" class="arrow-icon">
         </div>
-        <!-- 内容 1 -->
-        <div class="accordion-content">
-            <ul>
+        <!-- 内容块：全局提示 -->
+        <div class="accordion-content show">
+            <div class="notice-banner" style="background: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179, 8, 0.3); color: #facc15; padding: 10px 14px; border-radius: 8px; font-size: 13px;">
+                ⚠️ 遇到报错请勿担忧，99%都是网络节点问题，请阅读下方指南或联系客服。
+            </div>
+            <ul class="nested-list" style="margin-top: 10px;">
                 <li><strong>网络推荐：</strong>强烈建议使用 <span class="warning-text">US (美国)</span> 或 <span class="warning-text">HK (香港)</span> 节点，中文字幕最友好。</li>
                 <li><strong>观看范围：</strong>仅可观看带 <span class="highlight-text">蓝色小勾 ✔️</span> 的免费影片。</li>
                 <li><strong>严禁操作：</strong>请勿点击带“小黄袋子”图标的付费影片，尝试播放会导致账号被封禁。<span class="notice-highlight">如需付费订阅 点击上方按钮联系客服。</span></li>
             </ul>
         </div>
 
-        <!-- 标题 2：各设备使用教程 (总标题) -->
-        <div class="accordion-title" onclick="toggleAccordion(this)">
+        <!-- 大标题：各设备使用教程 (常驻显示，不折叠) -->
+        <div class="accordion-title" style="cursor: default; background: #0f172a; border-bottom: 1px solid var(--border-color); border-top: 1px solid var(--border-color); margin-top: 10px;">
             <div class="title-left">
                 <img src="https://img.icons8.com/fluency/48/multiple-devices.png" alt="设备图标" class="menu-icon">
-                <span>💻 各设备使用教程</span>
-            </div>
-            <img src="https://img.icons8.com/ios-glyphs/30/475569/chevron-right.png" alt="展开" class="arrow-icon">
-        </div>
-        <!-- 内容 2 (包含所有子设备) -->
-        <div class="accordion-content">
-            <div class="guide-section">
-                <h4>🖥️ 电脑网页端</h4>
-                <ul>
-                    <li>访问官网 <strong>primevideo.com</strong>，登录时手机区号务必选择 <span class="highlight-text">+1 (US)</span>。</li>
-                    <li>输入密码后，使用本网页获取 6 位 OTP 填入即可。</li>
-                </ul>
-            </div>
-            <div class="guide-section">
-                <h4>📱 手机 / 平板端</h4>
-                <ul>
-                    <li><strong>安卓：</strong>在 Google Play 或使用 APK Pure 下载 App。</li>
-                    <li><strong>苹果：</strong>需使用外区(如美区/港区) Apple ID 登录 App Store 下载。</li>
-                    <li>打开 App，区号选择 <span class="highlight-text">+1 (US)</span>，输入密码与本网页的 OTP。</li>
-                </ul>
-            </div>
-            <div class="guide-section">
-                <h4>📺 智能电视端</h4>
-                <ul>
-                    <li>在手机浏览器打开 <strong>amazon.com/mytv</strong>，登录后输入电视屏幕上的匹配码。</li>
-                </ul>
-            </div>
-            <div class="faq">
-                <h4 style="color: #f87171; margin: 0 0 4px 0;">❓ 常见报错排查</h4>
-                <strong>报错 7031 / 5004 或“所在地区不可用”</strong><br>
-                原因：账号正常！您的网络节点 IP 不够纯净。<br>
-                解决：更换更纯净的 US/HK 节点，重启网络工具并刷新网页。
+                <span>💻 各设备使用教程 (点击下方小项展开)</span>
             </div>
         </div>
 
+        <!-- 折叠项 1：电脑网页端 -->
+        <div class="accordion-title" onclick="toggleAccordion(this)">
+            <div class="title-left">🖥️ 电脑网页端</div>
+            <img src="https://img.icons8.com/ios-glyphs/30/94a3b8/chevron-right.png" alt="展开" class="arrow-icon">
+        </div>
+        <div class="accordion-content">
+            <ul class="nested-list">
+                <li>访问官网 <strong>primevideo.com</strong>，登录时手机区号务必选择 <span class="highlight-text">+1 (US)</span>。</li>
+                <li>输入密码后，使用本网页获取 6 位 OTP 填入即可。</li>
+            </ul>
+        </div>
+
+        <!-- 折叠项 2：手机 / 平板端 -->
+        <div class="accordion-title" onclick="toggleAccordion(this)">
+            <div class="title-left">📱 手机 / 平板端</div>
+            <img src="https://img.icons8.com/ios-glyphs/30/94a3b8/chevron-right.png" alt="展开" class="arrow-icon">
+        </div>
+        <div class="accordion-content">
+            <ul class="nested-list">
+                <li><strong>安卓：</strong>在 Google Play 或使用 APK Pure 下载 App。</li>
+                <li><strong>苹果：</strong>需使用外区(如美区/港区) Apple ID 登录 App Store 下载。</li>
+                <li>打开 App，区号选择 <span class="highlight-text">+1 (US)</span>，输入密码与本网页的 OTP。</li>
+            </ul>
+        </div>
+
+        <!-- 折叠项 3：智能电视端 -->
+        <div class="accordion-title" onclick="toggleAccordion(this)">
+            <div class="title-left">📺 智能电视端</div>
+            <img src="https://img.icons8.com/ios-glyphs/30/94a3b8/chevron-right.png" alt="展开" class="arrow-icon">
+        </div>
+        <div class="accordion-content">
+            <ul class="nested-list">
+                <li>在手机浏览器打开 <strong>amazon.com/mytv</strong>，登录后输入电视屏幕上的匹配码。</li>
+            </ul>
+        </div>
+
+        <!-- 常见报错排查卡片 (固定显示在指南区域底部) -->
+        <div class="faq-card" style="margin: 16px;">
+            <h4>❓ 常见报错排查</h4>
+            <strong>报错 7031 / 5004 或“所在地区不可用”</strong><br>
+            原因：账号正常！您的网络节点 IP 不够纯净。<br>
+            解决：更换更纯净的 US/HK 节点，重启网络工具并刷新网页。
+        </div>
     </div>
 </div>
 
@@ -501,16 +507,14 @@
 
     // ==================== 4. 折叠菜单控制逻辑 ====================
     function toggleAccordion(element) {
+        // 切换当前标题的激活状态
         element.classList.toggle("active");
+        // 找到紧跟其后的内容区域
         var content = element.nextElementSibling;
+        // 如果内容区域是展开的，就收起；如果是收起的，就展开
         if (content.classList.contains("show")) {
             content.classList.remove("show");
         } else {
-            // 可选：如果想实现“每次只展开一个”，可以在这里关闭其他已展开的
-            // var allContents = document.querySelectorAll(".accordion-content");
-            // var allTitles = document.querySelectorAll(".accordion-title");
-            // allContents.forEach(c => c.classList.remove("show"));
-            // allTitles.forEach(t => t.classList.remove("active"));
             content.classList.add("show");
         }
     }
