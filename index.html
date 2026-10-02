@@ -110,7 +110,7 @@
         .error { color: #f87171; font-size: 14px; font-weight: bold; padding: 10px; }
         .debug-info { font-size: 11px; color: #64748b; margin-top: 10px; word-break: break-all; }
 
-        /* ==================== 动态双向箭头 + 客标 3D 按钮 ==================== */
+        /* ==================== 动态双向聚拢箭头 + 客服图标 3D 按钮 ==================== */
         .top-support-container {
             margin-bottom: 20px;
         }
@@ -147,24 +147,24 @@
             box-shadow: 0 2px 0 #0369a1, 0 4px 10px rgba(2, 132, 199, 0.4);
         }
 
-        /* 动态跳动左箭头 */
+        /* 左侧手势向右跳动 */
         .arrow-left {
             display: inline-block;
-            animation: bounceLeft 1s infinite alternate;
+            animation: moveRight 1s infinite alternate;
         }
-        @keyframes bounceLeft {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-4px); }
+        @keyframes moveRight {
+            0% { transform: translateX(-3px); }
+            100% { transform: translateX(3px); }
         }
 
-        /* 动态跳动右箭头 */
+        /* 右侧手势向左跳动 */
         .arrow-right {
             display: inline-block;
-            animation: bounceRight 1s infinite alternate;
+            animation: moveLeft 1s infinite alternate;
         }
-        @keyframes bounceRight {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(4px); }
+        @keyframes moveLeft {
+            0% { transform: translateX(3px); }
+            100% { transform: translateX(-3px); }
         }
 
         /* 中间客服图标呼吸特效 */
@@ -319,13 +319,13 @@
     <!-- 复制成功提示气泡 -->
     <div id="toast" class="toast">📋 验证码已复制成功！</div>
 
-    <!-- 带有动态双向箭头和客服图标的 3D 按钮 -->
+    <!-- 带有动态双向聚拢箭头与客服图标的 3D 按钮 -->
     <div class="top-support-container">
         <button class="support-btn" onclick="openSupportModal()">
-            <span class="arrow-left">👈</span>
+            <span class="arrow-left">👉</span>
             <span class="pulse-icon">🎧</span>
             <span>遇到问题？<span style="text-decoration: underline;">【点此联系售后客服】</span></span>
-            <span class="arrow-right">👉</span>
+            <span class="arrow-right">👈</span>
         </button>
     </div>
 
@@ -346,7 +346,7 @@
         </div>
 
         <div class="guide-section">
-            <h4>🖥️️ 电脑网页端</h4>
+            <h4>🖥 电脑网页端</h4>
             <ul>
                 <li>访问官网 <strong>primevideo.com</strong>，登录时手机区号务必选择 <span class="highlight-text">+1 (US)</span>。</li>
                 <li>输入密码后，使用本网页获取 6 位 OTP 填入即可。</li>
@@ -392,12 +392,12 @@
 <div id="supportModal" class="modal-overlay" onclick="closeSupportModal(event)">
     <div class="modal-card" onclick="event.stopPropagation()">
         <h4>📞 售后与客服支持</h4>
-        <p style="font-size: 13px; color: var(--text-sub); margin: 5px 0 10px 0;">请添加下方微信客服号获取人工协助：</p>
+        <p style="font-size: 13px; color: var(--text-sub); margin: 5px 0 10px 0;">请添加下方客服号获取人工协助：</p>
         
         <!-- 微信号高亮显示框 -->
         <div class="wechat-id-box" id="wechatText">amzpv777</div>
         
-        <button class="modal-btn" onclick="copyWechat()">📋 一键复制微信号</button>
+        <button class="modal-btn" onclick="copyWechat()">📋 一键复制添加客服：上将</button>
         <br>
         <button class="modal-close" onclick="closeSupportModal()">关闭窗口</button>
     </div>
@@ -450,14 +450,14 @@
         }
     }
 
-    // 5. 一键复制微信号逻辑
+    // 5. 一键复制客服号逻辑
     function copyWechat() {
         const wechatId = document.getElementById('wechatText').innerText;
         navigator.clipboard.writeText(wechatId).then(() => {
-            showToast("📋 微信号 amzpv777 已复制！");
+            showToast("📋 客服号 amzpv777 已复制！");
             closeSupportModal();
         }).catch(err => {
-            fallbackCopy(wechatId, "📋 微信号 amzpv777 已复制！");
+            fallbackCopy(wechatId, "📋 客服号 amzpv777 已复制！");
             closeSupportModal();
         });
     }
